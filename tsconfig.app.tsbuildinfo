@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/rankmap.ts","./src/main.tsx","./src/vite-env.d.ts","./src/api/api.ts","./src/components/rankchart.tsx","./src/components/rankhistory.tsx","./src/components/rankhistorydetail.tsx","./src/interfaces/imatch.ts"],"errors":true,"version":"5.6.3"}
+{"root":["./src/app.tsx","./src/rankmap.ts","./src/main.tsx","./src/vite-env.d.ts","./src/api/api.ts","./src/components/rankchart.tsx","./src/components/rankhistory.tsx","./src/components/rankhistorydetail.tsx","./src/interfaces/imatch.ts"],"version":"5.6.3"}
