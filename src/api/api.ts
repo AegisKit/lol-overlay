@@ -14,7 +14,7 @@ class Api {
 
   public async getAccountInfo(gameName: string, tagLine: string) {
     const response = await fetch(
-      `/asia/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}?api_key=${this.riotApiKey}`
+      `${this.asiaApiUrl}/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}?api_key=${this.riotApiKey}`
     );
     return response.json();
   }
