@@ -2,14 +2,14 @@ RewriteEngine On
 RewriteBase /
 
 # APIリクエストを別のドメインにリダイレクト
-RewriteCond %{REQUEST_URI} ^/asia/
-RewriteRule ^(.*)$ https://asia.api.riotgames.com/$1 [R=301,L]
+RewriteCond %{REQUEST_URI} ^/asia/(.*)$
+RewriteRule ^asia/(.*)$ https://asia.api.riotgames.com/$1 [R=301,L]
 
-RewriteCond %{REQUEST_URI} ^/jp1/
-RewriteRule ^(.*)$ https://jp1.api.riotgames.com/$1 [R=301,L]
+RewriteCond %{REQUEST_URI} ^/jp1/(.*)$
+RewriteRule ^jp1/(.*)$ https://jp1.api.riotgames.com/$1 [R=301,L]
 
-RewriteCond %{REQUEST_URI} ^/opgg/
-RewriteRule ^(.*)$ https://www.op.gg/$1 [R=301,L]
+RewriteCond %{REQUEST_URI} ^/opgg/(.*)$
+RewriteRule ^opgg/(.*)$ https://www.op.gg/$1 [R=301,L]
 
 # その他のリクエストはindex.htmlにリダイレクト
 RewriteCond %{REQUEST_FILENAME} !-f
