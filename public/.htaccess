@@ -1,17 +1,17 @@
 RewriteEngine On
 RewriteBase /
 
-# APIリクエストを除外
-RewriteCond %{REQUEST_URI} ^/asia
-RewriteRule ^(.*)$ https://asia.api.riotgames.com/$1 [P,L]
+# APIリクエストを別のドメインにリダイレクト
+RewriteCond %{REQUEST_URI} ^/asia/
+RewriteRule ^(.*)$ https://asia.api.riotgames.com/$1 [R=301,L]
 
-RewriteCond %{REQUEST_URI} ^/jp1
-RewriteRule ^(.*)$ https://jp1.api.riotgames.com/$1 [P,L]
+RewriteCond %{REQUEST_URI} ^/jp1/
+RewriteRule ^(.*)$ https://jp1.api.riotgames.com/$1 [R=301,L]
 
-RewriteCond %{REQUEST_URI} ^/opgg
-RewriteRule ^(.*)$ https://www.op.gg/$1 [P,L]
+RewriteCond %{REQUEST_URI} ^/opgg/
+RewriteRule ^(.*)$ https://www.op.gg/$1 [R=301,L]
 
-# ファイルやディレクトリが存在しない場合にのみリダイレクト
+# その他のリクエストはindex.htmlにリダイレクト
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.html [L]
