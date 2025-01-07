@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { createGlobalStyle } from "styled-components";
-import { OjiField } from "./components/OjiField";
-import { Header } from "./components/Header";
-import GridSettingModal from "./components/GridSettingModal";
-import UserSettingModal from "./components/UserSettingModal";
-import IconSettingModal from "./components/IconSettingModal";
+import { RankHistoryDetail } from "./components/RankHistoryDetail";
+import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
+import { api } from "./api/api";
+import { IMatch } from "./interfaces/IMatch";
+import { RankHistory } from "./components/RankHistory";
+import { RankChart } from "./components/RankChart";
+import styled from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
   html, body, #root {
@@ -16,157 +18,120 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
+const SummonerPage = styled.div`
+  position: relative;
+  width: 100%;
+  height: 150px;
+  overflow: hidden;
+`;
+
+const PageContainer = styled.div<{ isVisible: boolean }>`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: ${(props) => (props.isVisible ? "1" : "0")};
+  transition: opacity 1s ease-in-out;
+  pointer-events: ${(props) => (props.isVisible ? "auto" : "none")};
+  z-index: ${(props) => (props.isVisible ? "1" : "0")};
+`;
+
+const SummonerPageComponent = () => {
+  const { gameName, tagLine } = useParams();
+  const [matchDetails, setMatchDetails] = useState<IMatch[] | null>(null);
+  const [accountInfo, setAccountInfo] = useState(null);
+  const [matchIds, setMatchIds] = useState<string[] | null>(null);
+  const [summonerInfo, setSummonerInfo] = useState<any[]>([]);
+  const [summonerDetail, setSummonerDetail] = useState<any | null>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [lpHistories, setLpHistories] = useState([]);
+  let pages: any[] = [];
+
+  const fetchData = async () => {
+    if (gameName && tagLine) {
+      const opggData = await api.getLpHistoriesWeek(gameName, tagLine);
+      setLpHistories(opggData.pageProps.data.lp_histories);
+      const decodedGameName = decodeURIComponent(gameName);
+      const decodedTagLine = decodeURIComponent(tagLine);
+
+      const accountInfoJson = await api.getAccountInfo(
+        decodedGameName,
+        decodedTagLine
+      );
+      setAccountInfo(accountInfoJson);
+      const summonerInfo = await api.getSummonerId(accountInfoJson.puuid);
+      setSummonerInfo(summonerInfo);
+      const summonerDetailsJson = await api.getSummonerDetails(summonerInfo.id);
+      setSummonerDetail(
+        summonerDetailsJson.find(
+          (detail) => detail.queueType === "RANKED_SOLO_5x5"
+        )
+      );
+      const matchIdsJson = await api.getMatchIds(accountInfoJson.puuid);
+      setMatchIds(matchIdsJson.reverse());
+      const matchDetails = await Promise.all(
+        matchIdsJson.map((id) => api.getMatch(id, accountInfoJson.puuid))
+      );
+      setMatchDetails(
+        matchDetails.filter((match): match is IMatch => match !== null)
+      );
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    const fetchInterval = setInterval(fetchData, 60000);
+
+    return () => clearInterval(fetchInterval);
+  }, [gameName, tagLine]);
+
+  pages = [
+    ...(matchDetails !== null
+      ? [<RankHistoryDetail matches={matchDetails} />]
+      : []),
+    ...(summonerDetail !== null
+      ? [
+          <RankHistory
+            rankHistory={summonerDetail}
+            summonerInfo={summonerInfo}
+          />,
+        ]
+      : []),
+    ...(lpHistories !== undefined
+      ? [<RankChart lpHistories={lpHistories} />]
+      : []),
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentPage((prevPage) => (prevPage + 1) % pages.length);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [pages.length, currentPage]);
+
+  return (
+    <SummonerPage>
+      {pages.map((page, index) => (
+        <PageContainer key={index} isVisible={index === currentPage}>
+          {page}
+        </PageContainer>
+      ))}
+    </SummonerPage>
+  );
+};
+
 function App() {
-  const [gridSize, setGridSize] = useState<number | null>(null);
-  const [showUserSetting, setShowUserSetting] = useState(false);
-  const [showIconSetting, setShowIconSetting] = useState(false);
-  const [users, setUsers] = useState<string[]>([]);
-
-  useEffect(() => {
-    const storedUsers = localStorage.getItem("users");
-    if (storedUsers) {
-      setUsers(JSON.parse(storedUsers));
-    }
-  }, []);
-
-  useEffect(() => {
-    const handleScroll = (event: Event) => {
-      event.preventDefault();
-    };
-
-    document.body.style.overflow = "hidden";
-    window.addEventListener("scroll", handleScroll, { passive: false });
-
-    return () => {
-      document.body.style.overflow = "auto";
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  useEffect(() => {
-    const updateVh = () => {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty("--vh", `${vh}px`);
-    };
-
-    updateVh();
-    window.addEventListener("resize", updateVh);
-
-    return () => {
-      window.removeEventListener("resize", updateVh);
-    };
-  }, []);
-
-  const handleGridSizeSelect = (size: number) => {
-    setGridSize(size);
-    setShowUserSetting(true);
-  };
-
-  const handleIconSettingClose = () => {
-    setShowIconSetting(false);
-  };
-
-  const handleAddUser = (username: string) => {
-    if (gridSize !== null && users.length < gridSize) {
-      const newUsers = [...users, username];
-      setUsers(newUsers);
-      localStorage.setItem("users", JSON.stringify(newUsers));
-    }
-  };
-
-  const handleDeleteUser = (username: string) => {
-    const newUsers = users.filter((user) => user !== username);
-    setUsers(newUsers);
-    localStorage.setItem("users", JSON.stringify(newUsers));
-  };
-
-  const handleConfirm = () => {
-    setShowUserSetting(false);
-    setShowIconSetting(true);
-  };
-
-  const handleBackToSettings = () => {
-    setGridSize(null);
-    setShowUserSetting(true);
-    setShowIconSetting(false);
-  };
-
-  const setFillHeight = () => {
-    const vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty("--vh", `${vh}px`);
-  };
-
-  window.addEventListener("resize", setFillHeight);
-  setFillHeight();
-
-  const getBlobFromBase64 = (base64Data: string) => {
-    const byteString = atob(base64Data.split(",")[1]);
-    const arrayBuffer = new ArrayBuffer(byteString.length);
-    const intArray = new Uint8Array(arrayBuffer);
-    for (let i = 0; i < byteString.length; i++) {
-      intArray[i] = byteString.charCodeAt(i);
-    }
-    return new Blob([intArray], { type: "image/png" });
-  };
-
-  const normalImageData = localStorage.getItem("normalImage");
-  const normalImageUrl = normalImageData
-    ? URL.createObjectURL(getBlobFromBase64(normalImageData))
-    : "/images/kawaida-1.png";
-
-  const outImageData = localStorage.getItem("outImage");
-  const outImageUrl = outImageData
-    ? URL.createObjectURL(getBlobFromBase64(outImageData))
-    : "/images/mogi-1.png";
-
   return (
     <>
       <GlobalStyle />
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          width: "100vw",
-          height: "100%",
-          overflow: "hidden",
-        }}
-      >
-        <Header onBackToSettings={handleBackToSettings} />
-        <div
-          style={{
-            flex: 1,
-            backgroundImage: "url(/images/oji-bg.png)",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-start",
-            paddingTop: "2rem",
-            overflow: "hidden",
-          }}
-        >
-          {gridSize === null ? (
-            <GridSettingModal onSelect={handleGridSizeSelect} />
-          ) : showUserSetting ? (
-            <UserSettingModal
-              onAddUser={handleAddUser}
-              onConfirm={handleConfirm}
-              gridSize={gridSize}
-              users={users}
-              onDeleteUser={handleDeleteUser}
-            />
-          ) : showIconSetting ? (
-            <IconSettingModal onClose={handleIconSettingClose} />
-          ) : (
-            <OjiField
-              imageCount={gridSize}
-              users={users}
-              normalImage={normalImageUrl}
-              outImage={outImageUrl}
-            />
-          )}
-        </div>
-      </div>
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/:gameName/:tagLine"
+            element={<SummonerPageComponent />}
+          />
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }
