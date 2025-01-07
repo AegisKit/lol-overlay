@@ -1,0 +1,5 @@
+VITE_RIOT_API_KEY=
+VITE_ASIA_API_URL=http://localhost:3000/asia
+VITE_JP1_API_URL=http://localhost:3000/jp1
+VITE_OPGG_API_URL=http://localhost:3000/opgg
+

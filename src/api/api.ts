@@ -1,9 +1,15 @@
 import { IMatch } from "../interfaces/IMatch";
 class Api {
   private riotApiKey: string;
+  private asiaApiUrl: string;
+  private jp1ApiUrl: string;
+  private opggApiUrl: string;
 
   constructor() {
     this.riotApiKey = import.meta.env.VITE_RIOT_API_KEY;
+    this.asiaApiUrl = import.meta.env.VITE_ASIA_API_URL;
+    this.jp1ApiUrl = import.meta.env.VITE_JP1_API_URL;
+    this.opggApiUrl = import.meta.env.VITE_OPGG_API_URL;
   }
 
   public async getAccountInfo(gameName: string, tagLine: string) {
@@ -15,14 +21,14 @@ class Api {
 
   public async getMatchIds(puuid: string) {
     const response = await fetch(
-      `/asia/lol/match/v5/matches/by-puuid/${puuid}/ids?start=0&count=10&api_key=${this.riotApiKey}`
+      `${this.asiaApiUrl}/lol/match/v5/matches/by-puuid/${puuid}/ids?start=0&count=10&api_key=${this.riotApiKey}`
     );
     return response.json();
   }
 
   public async getMatch(matchId: string, puuid: string) {
     const response = await fetch(
-      `/asia/lol/match/v5/matches/${matchId}?api_key=${this.riotApiKey}`
+      `${this.asiaApiUrl}/lol/match/v5/matches/${matchId}?api_key=${this.riotApiKey}`
     );
     const matchData = await response.json();
     return this.formatMatch(matchData, puuid);
@@ -30,21 +36,21 @@ class Api {
 
   public async getSummonerId(puuid: string) {
     const response = await fetch(
-      `/jp1/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${this.riotApiKey}`
+      `${this.jp1ApiUrl}/lol/summoner/v4/summoners/by-puuid/${puuid}?api_key=${this.riotApiKey}`
     );
     return response.json();
   }
 
   public async getSummonerDetails(summonerId: string) {
     const response = await fetch(
-      `/jp1/lol/league/v4/entries/by-summoner/${summonerId}?api_key=${this.riotApiKey}`
+      `${this.jp1ApiUrl}/lol/league/v4/entries/by-summoner/${summonerId}?api_key=${this.riotApiKey}`
     );
     return response.json();
   }
 
   public async getLpHistoriesWeek(summonerName: string, tagLine: string) {
     const response = await fetch(
-      `/opgg/_next/data/IBYkm0UpdSJC8o2eaIlAL/en_US/summoners/jp/${summonerName}-${tagLine}.json?region=jp&summoner=${summonerName}-${tagLine}`
+      `${this.opggApiUrl}/_next/data/IBYkm0UpdSJC8o2eaIlAL/en_US/summoners/jp/${summonerName}-${tagLine}.json?region=jp&summoner=${summonerName}-${tagLine}`
     );
     return response.json();
   }
