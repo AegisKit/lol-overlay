@@ -100,7 +100,7 @@ export const RankChart = ({ lpHistories }: RankChartProps) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" interval={1} />
           <YAxis domain={[yAxisMin, yAxisMax]} tick={false} />
-          <Tooltip formatter={(value, name) => [value, ""]} />
+          <Tooltip formatter={(value) => [value, ""]} />
           <Legend formatter={() => ""} />
           <Line
             type="monotone"
@@ -115,7 +115,6 @@ export const RankChart = ({ lpHistories }: RankChartProps) => {
                   fill="#fff"
                   fontSize={14}
                   textAnchor="middle"
-                  zIndex={1000}
                 >
                   <tspan x={x} dy="-1.2em">
                     {data[index].tierLabel}

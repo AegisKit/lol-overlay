@@ -31,13 +31,6 @@ const MatchCard = styled.div`
   height: 110px;
   justify-content: space-between;
 
-  img {
-    width: 40px;
-    height: 40px;
-    border: 2px solid ${(props) => (props.win ? "#4CAF50" : "#f44336")};
-    border-radius: 50%;
-  }
-
   h5 {
     margin: 2px 0;
     font-size: 13px;
@@ -63,11 +56,17 @@ interface MatchCardProps {
   win: boolean;
 }
 
-const StyledMatchCard = styled(MatchCard)<MatchCardProps>``;
+const StyledMatchCard = styled(MatchCard)<MatchCardProps>`
+  img {
+    width: 40px;
+    height: 40px;
+    border: 2px solid ${(props) => (props.win ? "#4CAF50" : "#f44336")};
+    border-radius: 50%;
+  }
+`;
 
 interface RankHistoryProps {
   matches: IMatch[] | null;
-  isVisible: boolean;
 }
 
 export const RankHistoryDetail = ({ matches }: RankHistoryProps) => {

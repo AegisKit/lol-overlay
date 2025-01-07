@@ -38,7 +38,6 @@ const StateItemLabel = styled.p`
 interface RankHistoryProps {
   rankHistory: any;
   summonerInfo: any;
-  isVisible: boolean;
 }
 
 const IconImage = styled.img`
