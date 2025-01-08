@@ -10,16 +10,12 @@ import {
 import styled from "styled-components";
 
 const Container = styled.div`
-  display: flex;
   flex-direction: column;
   justify-content: center;
   height: 160px;
-  padding-top: 30px;
 `;
 
 const RankChartContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
   max-width: 640px;
   width: 100%;
   position: fixed;
@@ -112,7 +108,7 @@ export const RankChart = ({ lpHistories }: RankChartProps) => {
                   x={x}
                   y={y - 7}
                   dy={-10}
-                  fill="#fff"
+                  fill="#EDF3B7"
                   fontSize={14}
                   textAnchor="middle"
                 >

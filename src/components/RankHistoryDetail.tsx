@@ -6,6 +6,7 @@ const Container = styled.div`
   flex-direction: column;
   justify-content: center;
   height: 160px;
+  width: 100%;
   padding-top: 0;
 `;
 
@@ -27,7 +28,7 @@ const MatchCard = styled.div`
   padding: 6px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.1);
-  width: 72px;
+  width: 65px;
   height: 110px;
   justify-content: space-between;
 
@@ -78,29 +79,27 @@ export const RankHistoryDetail = ({ matches }: RankHistoryProps) => {
   };
 
   return (
-    <>
-      <Container>
-        <MatchesContainer>
-          {matches.map((match, index) => {
-            const kda = Number(
-              calculateKDA(match.kills, match.deaths, match.assists)
-            );
+    <Container>
+      <MatchesContainer>
+        {matches.map((match, index) => {
+          const kda = Number(
+            calculateKDA(match.kills, match.deaths, match.assists)
+          );
 
-            return (
-              <StyledMatchCard key={index} win={match.win}>
-                <h5>
-                  {match.kills}/{match.deaths}/{match.assists}
-                </h5>
-                <img src={match.championIconUrl} alt={match.championName} />
-                <KDAText kda={kda}>
-                  <span>KDA</span>
-                  <span>{kda}</span>
-                </KDAText>
-              </StyledMatchCard>
-            );
-          })}
-        </MatchesContainer>
-      </Container>
-    </>
+          return (
+            <StyledMatchCard key={index} win={match.win}>
+              <h5>
+                {match.kills}/{match.deaths}/{match.assists}
+              </h5>
+              <img src={match.championIconUrl} alt={match.championName} />
+              <KDAText kda={kda}>
+                <span>KDA</span>
+                <span>{kda}</span>
+              </KDAText>
+            </StyledMatchCard>
+          );
+        })}
+      </MatchesContainer>
+    </Container>
   );
 };
