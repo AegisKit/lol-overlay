@@ -12,12 +12,12 @@ export const RankMap = {
   SILVER: {
     icon: "/images/Rank=Silver.png",
     wing: "/images/Wings/Silver.png",
-    color: "rgba(119, 134, 142, 0.3)",
+    color: "rgb(141, 158, 169, 0.3)",
   },
   GOLD: {
     icon: "/images/Rank=Gold.png",
     wing: "/images/Wings/Gold.png",
-    color: "rgba(203, 166, 108, 0.3)",
+    color: "rgba(184, 134, 11, 0.6)",
   },
   PLATINUM: {
     icon: "/images/Rank=Platinum.png",
@@ -32,20 +32,21 @@ export const RankMap = {
   DIAMOND: {
     icon: "/images/Rank=Diamond.png",
     wing: "/images/Wings/Diamond.png",
+    color: "rgb(51, 0, 200, 0.5)",
   },
   MASTER: {
     icon: "/images/Rank=Master.png",
     wing: "/images/Wings/Master.png",
-    color: "rgba(170, 77, 219, 0.3)",
+    color: "rgb(131, 29, 216 ,0.3)",
   },
   GRANDMASTER: {
     icon: "/images/Rank=Grandmaster.png",
     wing: "/images/Wings/Grandmaster.png",
-    color: "rgba(207, 66, 69, 0.3)",
+    color: "rgba(207, 66, 69, 0.5)",
   },
   CHALLENGER: {
     icon: "/images/Rank=Challenger.png",
     wing: "/images/Wings/Challenger.png",
-    color: "rgba(246, 208, 149, 0.3)",
+    color: "rgba(100, 200, 200, 0.3)",
   },
 };
