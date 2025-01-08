@@ -50,7 +50,7 @@ class Api {
 
   public async getLpHistoriesWeek(summonerName: string, tagLine: string) {
     const response = await fetch(
-      `${this.opggApiUrl}/_next/data/IBYkm0UpdSJC8o2eaIlAL/en_US/summoners/jp/${summonerName}-${tagLine}.json?region=jp&summoner=${summonerName}-${tagLine}`
+      `${this.opggApiUrl}/_next/data/IBYkm0UpdSJC8o2eaIlAL/en_US/summoners/jp/${summonerName}-${tagLine}.json?region=jp`
     );
     return response.json();
   }
