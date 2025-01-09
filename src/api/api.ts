@@ -49,10 +49,22 @@ class Api {
   }
 
   public async getLpHistoriesWeek(summonerName: string, tagLine: string) {
-    const response = await fetch(
-      `${this.opggApiUrl}/_next/data/IBYkm0UpdSJC8o2eaIlAL/en_US/summoners/jp/${summonerName}-${tagLine}.json?region=jp`
-    );
-    return response.json();
+    try {
+      const response = await fetch(
+        `${this.opggApiUrl}/_next/data/IBYkm0UpdSJC8o2eaIlAL/en_US/summoners/jp/${summonerName}-${tagLine}.json?region=jp`
+      );
+
+      if (!response.ok) {
+        // HTTPエラーの場合はnullを返す
+        return null;
+      }
+
+      return await response.json();
+    } catch (error) {
+      // JSONのパースエラーやネットワークエラーの場合はnullを返す
+      console.error("Error fetching LP histories:", error);
+      return null;
+    }
   }
 
   private formatMatch(match: any, puuid: string): IMatch | null {
