@@ -48,8 +48,8 @@ const SummonerPageComponent = () => {
 
   const fetchData = async () => {
     if (gameName && tagLine) {
-      const opggData = await api.getLpHistoriesWeek(gameName, tagLine);
-      setLpHistories(opggData.pageProps.data.lp_histories);
+      // const opggData = await api.getLpHistoriesWeek(gameName, tagLine);
+      // setLpHistories(opggData.pageProps.data.lp_histories);
       const decodedGameName = decodeURIComponent(gameName);
       const decodedTagLine = decodeURIComponent(tagLine);
 
@@ -96,7 +96,7 @@ const SummonerPageComponent = () => {
           />,
         ]
       : []),
-    ...(lpHistories !== undefined
+    ...(lpHistories !== undefined && lpHistories.length > 0
       ? [<RankChart lpHistories={lpHistories} />]
       : []),
   ];
