@@ -125,7 +125,7 @@ const SummonerPageComponent = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentPage((prevPage) => (prevPage + 1) % pages.length);
-    }, 5000);
+    }, 15000);
 
     return () => clearInterval(timer);
   }, [pages.length, currentPage]);

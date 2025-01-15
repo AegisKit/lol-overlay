@@ -23,11 +23,6 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/opgg/, ""),
       },
-      "/opggfe": {
-        target: "https://www.op.gg",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/opggfe/, ""),
-      },
     },
   },
 });
