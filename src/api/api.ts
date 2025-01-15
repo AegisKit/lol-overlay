@@ -173,7 +173,7 @@ class Api {
 
   public async getRuneIcons(runes) {
     const runeJson = await fetch(
-      "http://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/runesReforged.json"
+      "https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/runesReforged.json"
     );
     const runeData = await runeJson.json();
     const mainRune = Object.values(runeData).find(
