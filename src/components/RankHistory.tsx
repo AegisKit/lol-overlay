@@ -111,6 +111,10 @@ export const RankHistory = ({
         </RankInfo>
       </StatItem>
       <StatItem>
+        <StateItemLabel>LP</StateItemLabel>
+        <StatItemText>{rankHistory.leaguePoints}</StatItemText>
+      </StatItem>
+      <StatItem>
         <StateItemLabel>QUEUE</StateItemLabel>
         <StatItemText>
           {queueTypeMap[rankHistory.queueType] || rankHistory.queueType}
@@ -123,10 +127,6 @@ export const RankHistory = ({
       <StatItem>
         <StateItemLabel>WINRATE</StateItemLabel>
         <StatItemText>{winRate}%</StatItemText>
-      </StatItem>
-      <StatItem>
-        <StateItemLabel>LP</StateItemLabel>
-        <StatItemText>{rankHistory.leaguePoints}</StatItemText>
       </StatItem>
       <StatItem>
         <IconImage

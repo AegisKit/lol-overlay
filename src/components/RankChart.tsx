@@ -94,7 +94,16 @@ export const RankChart = ({ lpHistories }: RankChartProps) => {
           margin={{ top: 30, right: 40, left: 20, bottom: 20 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" interval={1} />
+          <XAxis
+            dataKey="date"
+            interval={0}
+            tickFormatter={(value, index) => {
+              if (index === data.length - 1) {
+                return value; // 最後の日付を必ず表示
+              }
+              return index % 2 === 0 ? value : ""; // 他のラベルは間引く
+            }}
+          />
           <YAxis domain={[yAxisMin, yAxisMax]} tick={false} />
           <Tooltip formatter={(value) => [value, ""]} />
           <Legend formatter={() => ""} />

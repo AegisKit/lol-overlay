@@ -110,6 +110,23 @@ class Api {
     }
   }
 
+  public async getLpHistoriesWeek(opggId: string) {
+    try {
+      const response = await fetch(
+        `${this.opggApiUrl}/api/v1.0/internal/bypass/summoners/jp/${opggId}/lp-histories?lp_history_type=WEEK`
+      );
+
+      if (!response.ok) {
+        return null;
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching LP histories:", error);
+      return null;
+    }
+  }
+
   public async getLiveGame(puuid: string) {
     const response = await fetch(
       `${this.jp1ApiUrl}/lol/spectator/v5/active-games/by-summoner/${puuid}?api_key=${this.riotApiKey}`
@@ -125,7 +142,9 @@ class Api {
           deaths: participant.deaths,
           assists: participant.assists,
           championName: participant.championName,
-          championIconUrl: this.getChampionIconUrl(participant.championName),
+          championIconUrl: this.getChampionIconUrlFromName(
+            participant.championName
+          ),
           win: participant.win,
         };
       }
@@ -133,8 +152,77 @@ class Api {
     return null;
   }
 
-  private getChampionIconUrl(championName: string) {
+  private getChampionIconUrlFromName(championName: string) {
     return `https://ddragon.leagueoflegends.com/cdn/14.24.1/img/champion/${championName}.png`;
+  }
+
+  public async getChampionIconUrlFromId(championId: string) {
+    const championsJson = await fetch(
+      "https://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/champion.json"
+    );
+    const champions = await championsJson.json();
+    const championData = Object.values(champions)[3];
+    const champion = Object.values(championData).find(
+      (data: any) => data.key == championId
+    ) as { id: string } | undefined;
+
+    const championName = champion?.id;
+
+    return this.getChampionIconUrlFromName(championName);
+  }
+
+  public async getRuneIcons(runes) {
+    const runeJson = await fetch(
+      "http://ddragon.leagueoflegends.com/cdn/15.1.1/data/en_US/runesReforged.json"
+    );
+    const runeData = await runeJson.json();
+    const mainRune = Object.values(runeData).find(
+      (data: any) => data.id == runes.perkStyle
+    ) as
+      | { icon: string; slots: { runes: { id: string; icon: string }[] }[] }
+      | undefined;
+    const mainAllRunes = mainRune.slots.flatMap((slot) => slot.runes);
+    const mainRuneIds = runes.perkIds.slice(0, 3);
+    const mainRunes = mainAllRunes.filter((rune) =>
+      mainRuneIds.includes(rune.id)
+    );
+
+    const subRune = Object.values(runeData).find(
+      (data: any) => data.id == runes.perkSubStyle
+    ) as
+      | { icon: string; slots: { runes: { id: string; icon: string }[] }[] }
+      | undefined;
+    const subAllRunes = subRune.slots.flatMap((slot) => slot.runes);
+    const subRuneIds = runes.perkIds.slice(3, 6);
+    const subRunes = subAllRunes.filter((rune) => subRuneIds.includes(rune.id));
+
+    const StatModMap = {
+      5011: "/images/StatMods/healthplusicon.png",
+      5008: "/images/StatMods/aptiveforceicon.png",
+      5001: "/images/StatMods/healthscalingicon.png",
+      5007: "/images/StatMods/cdrscalingicon.png",
+      5005: "/images/StatMods/attackspeedicon.png",
+      5013: "/images/StatMods/stenacityicon.png",
+      5010: "/images/StatMods/movementspeedicon.png",
+    };
+
+    const shards = runes.perkIds.slice(6, 9);
+    const shardIcons = shards.map((shard) => StatModMap[shard]);
+    return {
+      mainRune: {
+        icon: `https://ddragon.leagueoflegends.com/cdn/img/${mainRune?.icon}`,
+        runes: mainRunes.map(
+          (rune) => `https://ddragon.leagueoflegends.com/cdn/img/${rune.icon}`
+        ),
+      },
+      subRune: {
+        icon: `https://ddragon.leagueoflegends.com/cdn/img/${subRune?.icon}`,
+        runes: subRunes.map(
+          (rune) => `https://ddragon.leagueoflegends.com/cdn/img/${rune.icon}`
+        ),
+      },
+      shards: shardIcons,
+    };
   }
 }
 

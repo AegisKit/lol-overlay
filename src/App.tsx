@@ -6,6 +6,7 @@ import { api } from "./api/api";
 import { IMatch } from "./interfaces/IMatch";
 import { RankHistory } from "./components/RankHistory";
 import { RankChart } from "./components/RankChart";
+import { LiveGame } from "./components/LiveGame";
 import styled from "styled-components";
 
 const GlobalStyle = createGlobalStyle`
@@ -40,10 +41,11 @@ const SummonerPageComponent = () => {
   const [matchDetails, setMatchDetails] = useState<IMatch[] | null>(null);
   const [accountInfo, setAccountInfo] = useState(null);
   const [matchIds, setMatchIds] = useState<string[] | null>(null);
-  const [summonerInfo, setSummonerInfo] = useState<any[]>([]);
+  const [summonerInfo, setSummonerInfo] = useState<any>(null);
   const [summonerDetail, setSummonerDetail] = useState<any | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [lpHistories, setLpHistories] = useState([]);
+  const [liveGame, setLiveGame] = useState<any | null>(null);
   let pages: any[] = [];
 
   const fetchData = async () => {
@@ -54,8 +56,11 @@ const SummonerPageComponent = () => {
         tagLine,
         opggBuildId
       );
-      if (opggSummonerInfo) {
-        setLpHistories(opggSummonerInfo.pageProps.data.lp_histories);
+      const lpHistoriesJson = await api.getLpHistoriesWeek(
+        opggSummonerInfo.pageProps.data.summoner_id
+      );
+      if (lpHistoriesJson) {
+        setLpHistories(lpHistoriesJson.data);
       }
       const decodedGameName = decodeURIComponent(gameName);
       const decodedTagLine = decodeURIComponent(tagLine);
@@ -81,7 +86,12 @@ const SummonerPageComponent = () => {
       setMatchDetails(
         matchDetails.filter((match): match is IMatch => match !== null)
       );
-      const liveGame = await api.getLiveGame(accountInfoJson.puuid);
+      const liveGameJson = await api.getLiveGame(accountInfoJson.puuid);
+      if (liveGameJson.status?.status_code !== 404) {
+        setLiveGame(liveGameJson);
+      } else {
+        setLiveGame(null);
+      }
     }
   };
 
@@ -107,12 +117,15 @@ const SummonerPageComponent = () => {
     ...(lpHistories.length > 0
       ? [<RankChart lpHistories={lpHistories} />]
       : []),
+    ...(liveGame !== null
+      ? [<LiveGame gameInfo={liveGame} summonerId={summonerInfo.id} />]
+      : []),
   ];
 
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentPage((prevPage) => (prevPage + 1) % pages.length);
-    }, 15000);
+    }, 5000);
 
     return () => clearInterval(timer);
   }, [pages.length, currentPage]);
