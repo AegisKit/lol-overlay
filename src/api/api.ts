@@ -1,15 +1,18 @@
 import { IMatch } from "../interfaces/IMatch";
+
 class Api {
   private riotApiKey: string;
   private asiaApiUrl: string;
   private jp1ApiUrl: string;
   private opggApiUrl: string;
+  private opggWebUrl: string;
 
   constructor() {
     this.riotApiKey = import.meta.env.VITE_RIOT_API_KEY;
     this.asiaApiUrl = import.meta.env.VITE_ASIA_API_URL;
     this.jp1ApiUrl = import.meta.env.VITE_JP1_API_URL;
     this.opggApiUrl = import.meta.env.VITE_OPGG_API_URL;
+    this.opggWebUrl = import.meta.env.VITE_OPGG_WEB_URL;
   }
 
   public async getAccountInfo(gameName: string, tagLine: string) {
@@ -48,23 +51,70 @@ class Api {
     return response.json();
   }
 
-  public async getLpHistoriesWeek(summonerName: string, tagLine: string) {
+  public async getOpggSummonerInfo(
+    summonerName: string,
+    tagLine: string,
+    buildId: string
+  ) {
+    const response = await fetch(
+      `${this.opggWebUrl}/_next/data/${buildId}/en_US/summoners/jp/${summonerName}-${tagLine}.json?region=jp&summoner=${summonerName}-${tagLine}`
+    );
+    return response.json();
+  }
+
+  public async getOpggBuildId(summonerName: string, tagLine: string) {
     try {
       const response = await fetch(
-        `${this.opggApiUrl}/_next/data/IBYkm0UpdSJC8o2eaIlAL/en_US/summoners/jp/${summonerName}-${tagLine}.json?region=jp`
+        `${this.opggWebUrl}/summoners/jp/${summonerName}-${tagLine}`
       );
 
       if (!response.ok) {
-        // HTTPエラーの場合はnullを返す
+        console.error("Failed to fetch page:", response.statusText);
         return null;
       }
 
-      return await response.json();
+      const html = await response.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, "text/html");
+
+      const scriptsArray = Array.from(doc.scripts);
+
+      const nextDataScript = scriptsArray.find((script) =>
+        script.innerText?.includes("buildId")
+      );
+
+      if (nextDataScript && nextDataScript.textContent) {
+        try {
+          // 文字列操作でbuildIdを抽出
+          const content = nextDataScript.textContent;
+          const buildIdIndex = content.indexOf("buildId");
+          if (buildIdIndex !== -1) {
+            const start = content.indexOf(":", buildIdIndex) + 1;
+            const end = content.indexOf('"', start + 2);
+            const buildId = content
+              .substring(start, end)
+              .trim()
+              .replace(/"/g, "")
+              .replace(/\\/g, "");
+            return buildId;
+          }
+        } catch (error) {
+          console.error("Failed to extract buildId:", error);
+        }
+      }
+
+      return null;
     } catch (error) {
-      // JSONのパースエラーやネットワークエラーの場合はnullを返す
-      console.error("Error fetching LP histories:", error);
+      console.error("Error fetching or parsing data:", error);
       return null;
     }
+  }
+
+  public async getLiveGame(puuid: string) {
+    const response = await fetch(
+      `${this.jp1ApiUrl}/lol/spectator/v5/active-games/by-summoner/${puuid}?api_key=${this.riotApiKey}`
+    );
+    return response.json();
   }
 
   private formatMatch(match: any, puuid: string): IMatch | null {

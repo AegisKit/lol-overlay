@@ -48,9 +48,14 @@ const SummonerPageComponent = () => {
 
   const fetchData = async () => {
     if (gameName && tagLine) {
-      const opggData = await api.getLpHistoriesWeek(gameName, tagLine);
-      if (opggData) {
-        setLpHistories(opggData.pageProps.data.lp_histories);
+      const opggBuildId = await api.getOpggBuildId(gameName, tagLine);
+      const opggSummonerInfo = await api.getOpggSummonerInfo(
+        gameName,
+        tagLine,
+        opggBuildId
+      );
+      if (opggSummonerInfo) {
+        setLpHistories(opggSummonerInfo.pageProps.data.lp_histories);
       }
       const decodedGameName = decodeURIComponent(gameName);
       const decodedTagLine = decodeURIComponent(tagLine);
@@ -76,6 +81,7 @@ const SummonerPageComponent = () => {
       setMatchDetails(
         matchDetails.filter((match): match is IMatch => match !== null)
       );
+      const liveGame = await api.getLiveGame(accountInfoJson.puuid);
     }
   };
 

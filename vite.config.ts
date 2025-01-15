@@ -19,9 +19,14 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/jp1/, ""),
       },
       "/opgg": {
-        target: "https://www.op.gg",
+        target: "https://lol-web-api.op.gg",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/opgg/, ""),
+      },
+      "/opggfe": {
+        target: "https://www.op.gg",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/opggfe/, ""),
       },
     },
   },
