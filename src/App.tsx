@@ -87,7 +87,10 @@ const SummonerPageComponent = () => {
         matchDetails.filter((match): match is IMatch => match !== null)
       );
       const liveGameJson = await api.getLiveGame(accountInfoJson.puuid);
-      if (liveGameJson.status?.status_code !== 404 || "error" in liveGameJson) {
+      if (
+        liveGameJson.status?.status_code !== 404 ||
+        !("error" in liveGameJson)
+      ) {
         setLiveGame(liveGameJson);
       } else {
         setLiveGame(null);
