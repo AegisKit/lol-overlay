@@ -88,7 +88,7 @@ const SummonerPageComponent = () => {
       );
       const liveGameJson = await api.getLiveGame(accountInfoJson.puuid);
       if (
-        liveGameJson.status?.status_code !== 404 ||
+        liveGameJson.status?.status_code !== 404 &&
         !("error" in liveGameJson)
       ) {
         setLiveGame(liveGameJson);
